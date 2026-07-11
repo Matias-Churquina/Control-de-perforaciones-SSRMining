@@ -1,0 +1,131 @@
+openapi: 3.0.3
+info:
+  title: SSRMining Control de Perforaciones API
+  version: 1.0.0
+  description: API backend para usuarios, roles, equipos y registros de perforacion.
+servers:
+  - url: http://localhost:3000/api/v1
+tags:
+  - name: Auth
+  - name: Roles
+  - name: Usuarios
+  - name: Equipos
+  - name: Perforaciones
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesion
+      responses:
+        "501":
+          description: Pendiente de implementar
+  /roles:
+    get:
+      tags: [Roles]
+      summary: Listar roles
+      responses:
+        "501":
+          description: Pendiente de implementar
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Listar usuarios
+      responses:
+        "501":
+          description: Pendiente de implementar
+  /equipos:
+    get:
+      tags: [Equipos]
+      summary: Listar equipos
+      responses:
+        "501":
+          description: Pendiente de implementar
+  /perforaciones:
+    get:
+      tags: [Perforaciones]
+      summary: Listar perforaciones
+      responses:
+        "501":
+          description: Pendiente de implementar
+components:
+  schemas:
+    EstadoEquipo:
+      type: string
+      enum: [ACTIVO, INACTIVO, MANTENIMIENTO]
+    EstadoPerforacion:
+      type: string
+      enum: [PENDIENTE, APROBADA, RECHAZADA]
+    Rol:
+      type: object
+      properties:
+        idRol:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        activo:
+          type: boolean
+    Usuario:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+        idRol:
+          type: integer
+        legajo:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        email:
+          type: string
+          format: email
+        activo:
+          type: boolean
+    Equipo:
+      type: object
+      properties:
+        idEquipo:
+          type: integer
+        codigo:
+          type: string
+        descripcion:
+          type: string
+        modelo:
+          type: string
+          nullable: true
+        estado:
+          $ref: "#/components/schemas/EstadoEquipo"
+    Perforacion:
+      type: object
+      properties:
+        idPerforacion:
+          type: integer
+        codigoPerforacion:
+          type: string
+        fecha:
+          type: string
+          format: date
+        fase:
+          type: string
+        banco:
+          type: integer
+        malla:
+          type: string
+        idPozo:
+          type: string
+        tipoRoca:
+          type: string
+        profundidadDiseno:
+          type: number
+        metrosPerforados:
+          type: number
+        profundidadReal:
+          type: number
+        tipoPozo:
+          type: string
+        estado:
+          $ref: "#/components/schemas/EstadoPerforacion"
