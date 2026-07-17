@@ -193,9 +193,99 @@ paths:
     get:
       tags: [Equipos]
       summary: Listar equipos
+      security:
+        - bearerAuth: []
       responses:
-        "501":
-          description: Pendiente de implementar
+        "200":
+          description: Equipos registrados
+    post:
+      tags: [Equipos]
+      summary: Crear equipo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipoInput"
+      responses:
+        "201":
+          description: Equipo creado
+  /equipos/{idEquipo}:
+    get:
+      tags: [Equipos]
+      summary: Obtener equipo por id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idEquipo
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Equipo encontrado
+    put:
+      tags: [Equipos]
+      summary: Actualizar equipo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idEquipo
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipoUpdateInput"
+      responses:
+        "200":
+          description: Equipo actualizado
+    delete:
+      tags: [Equipos]
+      summary: Desactivar equipo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idEquipo
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Equipo desactivado
+  /equipos/{idEquipo}/estado:
+    patch:
+      tags: [Equipos]
+      summary: Cambiar estado de equipo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idEquipo
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [estado]
+              properties:
+                estado:
+                  $ref: "#/components/schemas/EstadoEquipo"
+      responses:
+        "200":
+          description: Estado actualizado
   /perforaciones:
     get:
       tags: [Perforaciones]
@@ -318,6 +408,32 @@ components:
         modelo:
           type: string
           nullable: true
+        estado:
+          $ref: "#/components/schemas/EstadoEquipo"
+    EquipoInput:
+      type: object
+      required: [codigo, descripcion]
+      properties:
+        codigo:
+          type: string
+          example: PE 901
+        descripcion:
+          type: string
+          example: Perforadora PE 901
+        modelo:
+          type: string
+          example: Perforadora operativa
+        estado:
+          $ref: "#/components/schemas/EstadoEquipo"
+    EquipoUpdateInput:
+      type: object
+      properties:
+        codigo:
+          type: string
+        descripcion:
+          type: string
+        modelo:
+          type: string
         estado:
           $ref: "#/components/schemas/EstadoEquipo"
     Perforacion:
