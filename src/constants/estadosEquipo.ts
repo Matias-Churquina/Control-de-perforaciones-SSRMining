@@ -1,0 +1,8 @@
+export const ESTADOS_EQUIPO = {
+  ACTIVO: "ACTIVO",
+  INACTIVO: "INACTIVO",
+  MANTENIMIENTO: "MANTENIMIENTO"
+} as const;
+
+export const ESTADOS_EQUIPO_VALUES = Object.values(ESTADOS_EQUIPO);
+
