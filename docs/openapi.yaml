@@ -59,6 +59,12 @@ paths:
       summary: Crear rol
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RolInput"
       responses:
         "201":
           description: Rol creado
@@ -88,6 +94,12 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RolUpdateInput"
       responses:
         "200":
           description: Rol actualizado
@@ -119,6 +131,12 @@ paths:
       summary: Crear usuario
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioInput"
       responses:
         "201":
           description: Usuario creado
@@ -148,6 +166,12 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioUpdateInput"
       responses:
         "200":
           description: Usuario actualizado
@@ -204,6 +228,25 @@ components:
           nullable: true
         activo:
           type: boolean
+    RolInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          example: OPERADOR
+        descripcion:
+          type: string
+          example: Registra perforaciones operativas
+    RolUpdateInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        activo:
+          type: boolean
     Usuario:
       type: object
       properties:
@@ -220,6 +263,47 @@ components:
         email:
           type: string
           format: email
+        activo:
+          type: boolean
+    UsuarioInput:
+      type: object
+      required: [idRol, legajo, nombre, apellido, email, password]
+      properties:
+        idRol:
+          type: integer
+          example: 3
+        legajo:
+          type: string
+          example: "1010"
+        nombre:
+          type: string
+          example: Juan
+        apellido:
+          type: string
+          example: Perez
+        email:
+          type: string
+          format: email
+          example: juan.perez@ssrmining.local
+        password:
+          type: string
+          example: Usuario12345!
+    UsuarioUpdateInput:
+      type: object
+      properties:
+        idRol:
+          type: integer
+        legajo:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
         activo:
           type: boolean
     Equipo:

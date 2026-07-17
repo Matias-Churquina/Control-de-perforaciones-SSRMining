@@ -20,6 +20,14 @@ export const usuarioRepository = {
       include: { rol: true }
     }),
 
+  countActiveByRoleName: (nombreRol: string) =>
+    prisma.usuario.count({
+      where: {
+        activo: true,
+        rol: { nombre: nombreRol }
+      }
+    }),
+
   list: () =>
     prisma.usuario.findMany({
       include: { rol: true },
@@ -35,4 +43,3 @@ export const usuarioRepository = {
       include: { rol: true }
     })
 };
-

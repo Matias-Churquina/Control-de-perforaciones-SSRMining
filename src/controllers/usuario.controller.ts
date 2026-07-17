@@ -23,7 +23,7 @@ export const usuarioController = {
   },
 
   deactivate: async (req: Request, res: Response) => {
-    const usuario = await usuarioService.deactivate(Number(req.params.idUsuario));
+    const usuario = await usuarioService.deactivate(Number(req.params.idUsuario), req.usuario!.idUsuario);
     res.status(200).json({ data: usuario });
   }
 };

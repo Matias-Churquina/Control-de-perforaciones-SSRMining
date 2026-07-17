@@ -5,7 +5,7 @@ import { signToken } from "../utils/jwt";
 
 export const authService = {
   login: async (email: string, password: string) => {
-    const usuario = await usuarioRepository.findByEmail(email);
+    const usuario = await usuarioRepository.findByEmail(email.trim().toLowerCase());
 
     if (!usuario || !usuario.activo) {
       throw new ApiError(401, "Credenciales invalidas");
@@ -16,6 +16,10 @@ export const authService = {
     if (!passwordOk) {
       throw new ApiError(401, "Credenciales invalidas");
     }
+
+    await usuarioRepository.update(usuario.idUsuario, {
+      ultimoAcceso: new Date()
+    });
 
     const token = signToken({
       idUsuario: usuario.idUsuario,
@@ -37,4 +41,3 @@ export const authService = {
     };
   }
 };
-

@@ -64,5 +64,17 @@ describe("Usuarios y roles", () => {
     expect(deactivateResponse.status).toBe(200);
     expect(deactivateResponse.body.data.activo).toBe(false);
   });
-});
 
+  it("impide que un administrador se desactive a si mismo", async () => {
+    const token = await loginAdmin();
+    const me = await request(app)
+      .get("/api/v1/auth/me")
+      .set("Authorization", `Bearer ${token}`);
+
+    const response = await request(app)
+      .delete(`/api/v1/usuarios/${me.body.usuario.idUsuario}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(403);
+  });
+});
