@@ -290,9 +290,71 @@ paths:
     get:
       tags: [Perforaciones]
       summary: Listar perforaciones
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: fechaDesde
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: fechaHasta
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: estado
+          schema:
+            $ref: "#/components/schemas/EstadoPerforacion"
+        - in: query
+          name: idEquipo
+          schema:
+            type: integer
+        - in: query
+          name: idUsuarioRegistro
+          schema:
+            type: integer
+        - in: query
+          name: fase
+          schema:
+            type: string
+        - in: query
+          name: banco
+          schema:
+            type: integer
       responses:
-        "501":
-          description: Pendiente de implementar
+        "200":
+          description: Perforaciones registradas
+    post:
+      tags: [Perforaciones]
+      summary: Crear perforacion operativa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PerforacionInput"
+      responses:
+        "201":
+          description: Perforacion creada en estado pendiente
+  /perforaciones/{idPerforacion}:
+    get:
+      tags: [Perforaciones]
+      summary: Obtener perforacion por id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idPerforacion
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Perforacion encontrada
 components:
   securitySchemes:
     bearerAuth:
@@ -466,3 +528,74 @@ components:
           type: string
         estado:
           $ref: "#/components/schemas/EstadoPerforacion"
+        calculos:
+          type: object
+          properties:
+            duracionHoras:
+              type: number
+            rop:
+              type: number
+            adherencia:
+              type: number
+    PerforacionInput:
+      type: object
+      required:
+        - fecha
+        - fase
+        - banco
+        - malla
+        - idPozo
+        - tipoRoca
+        - profundidadDiseno
+        - metrosPerforados
+        - profundidadReal
+        - horaInicio
+        - horaFin
+        - tipoPozo
+        - idEquipo
+      properties:
+        codigoPerforacion:
+          type: string
+          example: PERF-20260717-PE901-001
+        fecha:
+          type: string
+          format: date
+          example: "2026-07-17"
+        fase:
+          type: string
+          example: Fase 7
+        banco:
+          type: integer
+          example: 4110
+        malla:
+          type: string
+          example: "04"
+        idPozo:
+          type: string
+          example: "105"
+        tipoRoca:
+          type: string
+          example: Toba (Blanda)
+        profundidadDiseno:
+          type: number
+          example: 10
+        metrosPerforados:
+          type: number
+          example: 10
+        profundidadReal:
+          type: number
+          example: 10
+        horaInicio:
+          type: string
+          example: "08:00"
+        horaFin:
+          type: string
+          example: "08:20"
+        tipoPozo:
+          type: string
+          example: Produccion
+        observaciones:
+          type: string
+        idEquipo:
+          type: integer
+          example: 1
