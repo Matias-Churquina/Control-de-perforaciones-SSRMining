@@ -16,23 +16,179 @@ paths:
     post:
       tags: [Auth]
       summary: Iniciar sesion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
       responses:
-        "501":
-          description: Pendiente de implementar
+        "200":
+          description: Login exitoso
+        "401":
+          description: Credenciales invalidas
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Obtener usuario autenticado desde el token
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Usuario autenticado
+        "401":
+          description: Token faltante o invalido
   /roles:
     get:
       tags: [Roles]
       summary: Listar roles
+      security:
+        - bearerAuth: []
       responses:
-        "501":
-          description: Pendiente de implementar
+        "200":
+          description: Roles registrados
+    post:
+      tags: [Roles]
+      summary: Crear rol
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RolInput"
+      responses:
+        "201":
+          description: Rol creado
+  /roles/{idRol}:
+    get:
+      tags: [Roles]
+      summary: Obtener rol por id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idRol
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rol encontrado
+    put:
+      tags: [Roles]
+      summary: Actualizar rol
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idRol
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RolUpdateInput"
+      responses:
+        "200":
+          description: Rol actualizado
+    delete:
+      tags: [Roles]
+      summary: Desactivar rol
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idRol
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rol desactivado
   /usuarios:
     get:
       tags: [Usuarios]
       summary: Listar usuarios
+      security:
+        - bearerAuth: []
       responses:
-        "501":
-          description: Pendiente de implementar
+        "200":
+          description: Usuarios registrados
+    post:
+      tags: [Usuarios]
+      summary: Crear usuario
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioInput"
+      responses:
+        "201":
+          description: Usuario creado
+  /usuarios/{idUsuario}:
+    get:
+      tags: [Usuarios]
+      summary: Obtener usuario por id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idUsuario
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Usuario encontrado
+    put:
+      tags: [Usuarios]
+      summary: Actualizar usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idUsuario
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioUpdateInput"
+      responses:
+        "200":
+          description: Usuario actualizado
+    delete:
+      tags: [Usuarios]
+      summary: Desactivar usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idUsuario
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Usuario desactivado
   /equipos:
     get:
       tags: [Equipos]
@@ -48,6 +204,11 @@ paths:
         "501":
           description: Pendiente de implementar
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     EstadoEquipo:
       type: string
@@ -67,6 +228,25 @@ components:
           nullable: true
         activo:
           type: boolean
+    RolInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          example: OPERADOR
+        descripcion:
+          type: string
+          example: Registra perforaciones operativas
+    RolUpdateInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        activo:
+          type: boolean
     Usuario:
       type: object
       properties:
@@ -83,6 +263,47 @@ components:
         email:
           type: string
           format: email
+        activo:
+          type: boolean
+    UsuarioInput:
+      type: object
+      required: [idRol, legajo, nombre, apellido, email, password]
+      properties:
+        idRol:
+          type: integer
+          example: 3
+        legajo:
+          type: string
+          example: "1010"
+        nombre:
+          type: string
+          example: Juan
+        apellido:
+          type: string
+          example: Perez
+        email:
+          type: string
+          format: email
+          example: juan.perez@ssrmining.local
+        password:
+          type: string
+          example: Usuario12345!
+    UsuarioUpdateInput:
+      type: object
+      properties:
+        idRol:
+          type: integer
+        legajo:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
         activo:
           type: boolean
     Equipo:
