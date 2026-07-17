@@ -15,6 +15,15 @@ export const perforacionController = {
   create: async (req: Request, res: Response) => {
     const perforacion = await perforacionService.create(req.body, req.usuario!);
     res.status(201).json({ data: perforacion });
+  },
+
+  update: async (req: Request, res: Response) => {
+    const perforacion = await perforacionService.update(Number(req.params.idPerforacion), req.body, req.usuario!);
+    res.status(200).json({ data: perforacion });
+  },
+
+  cancel: async (req: Request, res: Response) => {
+    const perforacion = await perforacionService.cancel(Number(req.params.idPerforacion), req.body, req.usuario!);
+    res.status(200).json({ data: perforacion });
   }
 };
-

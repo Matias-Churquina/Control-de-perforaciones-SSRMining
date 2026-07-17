@@ -355,6 +355,51 @@ paths:
       responses:
         "200":
           description: Perforacion encontrada
+    put:
+      tags: [Perforaciones]
+      summary: Actualizar perforacion pendiente
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idPerforacion
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PerforacionUpdateInput"
+      responses:
+        "200":
+          description: Perforacion actualizada
+    delete:
+      tags: [Perforaciones]
+      summary: Anular perforacion pendiente
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: idPerforacion
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [motivoRechazo]
+              properties:
+                motivoRechazo:
+                  type: string
+                  example: Registro anulado por carga incorrecta
+      responses:
+        "200":
+          description: Perforacion anulada
 components:
   securitySchemes:
     bearerAuth:
@@ -599,3 +644,37 @@ components:
         idEquipo:
           type: integer
           example: 1
+    PerforacionUpdateInput:
+      type: object
+      properties:
+        codigoPerforacion:
+          type: string
+        fecha:
+          type: string
+          format: date
+        fase:
+          type: string
+        banco:
+          type: integer
+        malla:
+          type: string
+        idPozo:
+          type: string
+        tipoRoca:
+          type: string
+        profundidadDiseno:
+          type: number
+        metrosPerforados:
+          type: number
+        profundidadReal:
+          type: number
+        horaInicio:
+          type: string
+        horaFin:
+          type: string
+        tipoPozo:
+          type: string
+        observaciones:
+          type: string
+        idEquipo:
+          type: integer

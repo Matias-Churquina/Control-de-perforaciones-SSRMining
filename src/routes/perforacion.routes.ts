@@ -6,9 +6,11 @@ import { requireRoles } from "../middleware/roles.middleware";
 import { validationMiddleware } from "../middleware/validation.middleware";
 import { asyncHandler } from "../utils/asyncHandler";
 import {
+  cancelPerforacionValidator,
   createPerforacionValidator,
   idPerforacionValidator,
-  listPerforacionValidator
+  listPerforacionValidator,
+  updatePerforacionValidator
 } from "../validators/perforacion.validator";
 
 export const perforacionRouter = Router();
@@ -28,4 +30,18 @@ perforacionRouter.post(
   createPerforacionValidator,
   validationMiddleware,
   asyncHandler(perforacionController.create)
+);
+perforacionRouter.put(
+  "/:idPerforacion",
+  requireRoles(ROLES.ADMINISTRADOR, ROLES.SUPERVISOR, ROLES.OPERADOR),
+  updatePerforacionValidator,
+  validationMiddleware,
+  asyncHandler(perforacionController.update)
+);
+perforacionRouter.delete(
+  "/:idPerforacion",
+  requireRoles(ROLES.ADMINISTRADOR, ROLES.SUPERVISOR, ROLES.OPERADOR),
+  cancelPerforacionValidator,
+  validationMiddleware,
+  asyncHandler(perforacionController.cancel)
 );

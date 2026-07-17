@@ -61,6 +61,16 @@ export const perforacionRepository = {
         usuarioRegistro: { include: { rol: true } },
         supervisorRevision: { include: { rol: true } }
       }
+    }),
+
+  update: (idPerforacion: number, data: Prisma.PerforacionUncheckedUpdateInput) =>
+    prisma.perforacion.update({
+      where: { idPerforacion },
+      data,
+      include: {
+        equipo: true,
+        usuarioRegistro: { include: { rol: true } },
+        supervisorRevision: { include: { rol: true } }
+      }
     })
 };
-
