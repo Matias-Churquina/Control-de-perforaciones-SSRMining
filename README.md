@@ -157,12 +157,24 @@ Health check:
 GET http://localhost:3000/health
 ```
 
-## Usuario seed inicial
+## Usuarios seed para pruebas
 
 ```text
 Email: admin@ssrmining.local
 Password: Admin12345!
 Rol: ADMINISTRADOR
+
+Email: supervisor@ssrmining.local
+Password: Supervisor12345!
+Rol: SUPERVISOR
+
+Email: operador1@ssrmining.local
+Password: Operador12345!
+Rol: OPERADOR
+
+Email: operador2@ssrmining.local
+Password: Operador12345!
+Rol: OPERADOR
 ```
 
 Cambiar estas credenciales antes de cualquier uso fuera del entorno local.
@@ -175,7 +187,7 @@ npm.cmd run build            # compilacion TypeScript
 npm.cmd test                 # pruebas automatizadas
 npm.cmd run prisma:generate  # genera Prisma Client
 npm.cmd run prisma:migrate   # ejecuta migraciones dev
-npm.cmd run db:seed          # carga roles, admin y equipos iniciales
+npm.cmd run db:seed          # carga usuarios, equipos y perforaciones demo
 npm.cmd run prisma:studio    # abre Prisma Studio
 ```
 
