@@ -7,6 +7,7 @@ servers:
   - url: http://localhost:3000/api/v1
 tags:
   - name: Auth
+  - name: Dashboard
   - name: Roles
   - name: Usuarios
   - name: Equipos
@@ -45,6 +46,54 @@ paths:
           description: Usuario autenticado
         "401":
           description: Token faltante o invalido
+  /dashboard/resumen:
+    get:
+      tags: [Dashboard]
+      summary: Obtener KPIs y datasets del dashboard operativo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: fechaDesde
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: fechaHasta
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: estado
+          schema:
+            $ref: "#/components/schemas/EstadoPerforacion"
+        - in: query
+          name: idEquipo
+          schema:
+            type: integer
+        - in: query
+          name: idUsuarioRegistro
+          schema:
+            type: integer
+        - in: query
+          name: fase
+          schema:
+            type: string
+        - in: query
+          name: banco
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resumen operativo calculado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResumenResponse"
+        "401":
+          description: Token faltante o invalido
+        "403":
+          description: Rol no autorizado
   /roles:
     get:
       tags: [Roles]
@@ -407,6 +456,70 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    DashboardResumenResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/DashboardResumen"
+    DashboardResumen:
+      type: object
+      properties:
+        filtros:
+          type: object
+        kpis:
+          type: object
+          properties:
+            metrosTotales:
+              type: number
+            pozosCompletados:
+              type: integer
+            ropPromedio:
+              type: number
+            adherenciaDiseno:
+              type: number
+        graficos:
+          type: object
+          properties:
+            metrosPorRoca:
+              type: array
+              items:
+                $ref: "#/components/schemas/SerieValor"
+            distribucionTipoPozo:
+              type: array
+              items:
+                $ref: "#/components/schemas/SerieValor"
+            metrosPorEquipo:
+              type: array
+              items:
+                $ref: "#/components/schemas/SerieValor"
+            metrosPorFase:
+              type: array
+              items:
+                $ref: "#/components/schemas/SerieValor"
+            metrosPorBanco:
+              type: array
+              items:
+                $ref: "#/components/schemas/SerieValor"
+            rankingOperadores:
+              type: array
+              items:
+                $ref: "#/components/schemas/SerieValor"
+            ropPorRoca:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  ropPromedio:
+                    type: number
+    SerieValor:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: number
     EstadoEquipo:
       type: string
       enum: [ACTIVO, INACTIVO, MANTENIMIENTO]
