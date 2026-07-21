@@ -2,7 +2,9 @@ openapi: 3.0.3
 info:
   title: SSRMining Control de Perforaciones API
   version: 1.0.0
-  description: API backend para usuarios, roles, equipos y registros de perforacion.
+  description: API backend desarrollada por Credere.Dev para usuarios, roles, equipos, perforaciones y dashboard operativo SSRMining.
+  contact:
+    name: Credere.Dev
 servers:
   - url: http://localhost:3000/api/v1
 tags:
