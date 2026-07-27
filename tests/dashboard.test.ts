@@ -38,8 +38,19 @@ describe("Dashboard", () => {
         metrosPorEquipo: expect.any(Array),
         metrosPorFase: expect.any(Array),
         metrosPorBanco: expect.any(Array),
+        estados: expect.any(Array),
         rankingOperadores: expect.any(Array),
+        precisionPorFase: expect.any(Array),
+        precisionPorBanco: expect.any(Array),
+        precisionPorOperador: expect.any(Array),
         ropPorRoca: expect.any(Array)
+      })
+    );
+    expect(response.body.data.opciones).toEqual(
+      expect.objectContaining({
+        fases: expect.any(Array),
+        equipos: expect.any(Array),
+        operadores: expect.any(Array)
       })
     );
   });

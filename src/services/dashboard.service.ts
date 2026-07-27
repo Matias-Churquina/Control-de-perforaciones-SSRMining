@@ -17,6 +17,19 @@ type NumericGroup = {
   value: number;
 };
 
+type PrecisionGroup = {
+  name: string;
+  diseno: number;
+  perforado: number;
+  real: number;
+};
+
+type PrecisionAccumulator = {
+  diseno: number;
+  perforado: number;
+  real: number;
+};
+
 type RopGroup = {
   name: string;
   sum: number;
@@ -54,6 +67,19 @@ const addToGroup = (groups: Record<string, number>, key: string, value: number) 
   groups[key] = (groups[key] ?? 0) + value;
 };
 
+const addPrecision = (
+  groups: Record<string, PrecisionAccumulator>,
+  key: string,
+  diseno: number,
+  perforado: number,
+  real: number
+) => {
+  groups[key] = groups[key] ?? { diseno: 0, perforado: 0, real: 0 };
+  groups[key].diseno += diseno;
+  groups[key].perforado += perforado;
+  groups[key].real += real;
+};
+
 const buildFilters = (query: DashboardQuery): DashboardFilters => ({
   fechaDesde: query.fechaDesde ? parseDateOnly(query.fechaDesde) : undefined,
   fechaHasta: query.fechaHasta ? parseDateOnly(query.fechaHasta) : undefined,
@@ -68,6 +94,14 @@ const toSortedGroups = (groups: Record<string, number>): NumericGroup[] =>
   Object.entries(groups)
     .map(([name, value]) => ({ name, value: round(value) }))
     .sort((a, b) => b.value - a.value);
+
+const toPrecisionGroups = (groups: Record<string, PrecisionAccumulator>): PrecisionGroup[] =>
+  Object.entries(groups).map(([name, value]) => ({
+    name,
+    diseno: round(value.diseno),
+    perforado: round(value.perforado),
+    real: round(value.real)
+  }));
 
 export const dashboardService = {
   getResumen: async (query: DashboardQuery) => {
@@ -85,6 +119,13 @@ export const dashboardService = {
     const metrosPorBanco: Record<string, number> = {};
     const rankingOperadores: Record<string, number> = {};
     const ropPorRoca: Record<string, RopGroup> = {};
+    const precisionPorFase: Record<string, PrecisionAccumulator> = {};
+    const precisionPorBanco: Record<string, PrecisionAccumulator> = {};
+    const precisionPorOperador: Record<string, PrecisionAccumulator> = {};
+    const estados: Record<string, number> = {};
+    const opcionesFase = new Set<string>();
+    const opcionesEquipo = new Set<string>();
+    const opcionesOperador = new Set<string>();
 
     for (const perforacion of perforaciones) {
       const metros = toNumber(perforacion.metrosPerforados);
@@ -93,6 +134,8 @@ export const dashboardService = {
       const horas = durationHours(perforacion.horaInicio, perforacion.horaFin);
       const rop = horas > 0 ? metros / horas : 0;
       const operador = `${perforacion.usuarioRegistro.apellido}, ${perforacion.usuarioRegistro.nombre}`;
+      const equipo = perforacion.equipo.codigo;
+      const banco = String(perforacion.banco);
 
       totalMetros += metros;
 
@@ -107,10 +150,17 @@ export const dashboardService = {
 
       addToGroup(metrosPorRoca, perforacion.tipoRoca, metros);
       addToGroup(distribucionTipoPozo, perforacion.tipoPozo, 1);
-      addToGroup(metrosPorEquipo, perforacion.equipo.codigo, metros);
+      addToGroup(metrosPorEquipo, equipo, metros);
       addToGroup(metrosPorFase, perforacion.fase, metros);
-      addToGroup(metrosPorBanco, String(perforacion.banco), metros);
+      addToGroup(metrosPorBanco, banco, metros);
       addToGroup(rankingOperadores, operador, metros);
+      addToGroup(estados, perforacion.estado, 1);
+      addPrecision(precisionPorFase, perforacion.fase, diseno, metros, real);
+      addPrecision(precisionPorBanco, banco, diseno, metros, real);
+      addPrecision(precisionPorOperador, operador, diseno, metros, real);
+      opcionesFase.add(perforacion.fase);
+      opcionesEquipo.add(equipo);
+      opcionesOperador.add(operador);
 
       ropPorRoca[perforacion.tipoRoca] = ropPorRoca[perforacion.tipoRoca] ?? {
         name: perforacion.tipoRoca,
@@ -129,13 +179,22 @@ export const dashboardService = {
         ropPromedio: ropCount > 0 ? round(sumRop / ropCount) : 0,
         adherenciaDiseno: perforaciones.length > 0 ? round((enRangoDiseno / perforaciones.length) * 100) : 0
       },
+      opciones: {
+        fases: Array.from(opcionesFase).sort(),
+        equipos: Array.from(opcionesEquipo).sort(),
+        operadores: Array.from(opcionesOperador).sort()
+      },
       graficos: {
         metrosPorRoca: toSortedGroups(metrosPorRoca),
         distribucionTipoPozo: toSortedGroups(distribucionTipoPozo),
         metrosPorEquipo: toSortedGroups(metrosPorEquipo),
         metrosPorFase: toSortedGroups(metrosPorFase),
         metrosPorBanco: toSortedGroups(metrosPorBanco),
+        estados: toSortedGroups(estados),
         rankingOperadores: toSortedGroups(rankingOperadores),
+        precisionPorFase: toPrecisionGroups(precisionPorFase),
+        precisionPorBanco: toPrecisionGroups(precisionPorBanco),
+        precisionPorOperador: toPrecisionGroups(precisionPorOperador),
         ropPorRoca: Object.values(ropPorRoca)
           .map((group) => ({
             name: group.name,

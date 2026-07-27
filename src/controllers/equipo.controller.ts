@@ -7,6 +7,11 @@ export const equipoController = {
     res.status(200).json({ data: equipos });
   },
 
+  options: async (_req: Request, res: Response) => {
+    const equipos = await equipoService.listActiveOptions();
+    res.status(200).json({ data: equipos });
+  },
+
   getById: async (req: Request, res: Response) => {
     const equipo = await equipoService.getById(Number(req.params.idEquipo));
     res.status(200).json({ data: equipo });
