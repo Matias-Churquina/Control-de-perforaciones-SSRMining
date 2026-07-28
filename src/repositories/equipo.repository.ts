@@ -7,6 +7,17 @@ export const equipoRepository = {
       orderBy: [{ estado: "asc" }, { codigo: "asc" }]
     }),
 
+  listActiveOptions: () =>
+    prisma.equipo.findMany({
+      where: { estado: "ACTIVO" },
+      select: {
+        idEquipo: true,
+        codigo: true,
+        modelo: true
+      },
+      orderBy: { codigo: "asc" }
+    }),
+
   findById: (idEquipo: number) => prisma.equipo.findUnique({ where: { idEquipo } }),
 
   findByCodigo: (codigo: string) => prisma.equipo.findUnique({ where: { codigo } }),

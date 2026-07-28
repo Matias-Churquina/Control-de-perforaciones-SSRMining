@@ -10,6 +10,15 @@ const loginAdmin = async () => {
   return response.body.token as string;
 };
 
+const loginOperador = async () => {
+  const response = await request(app).post("/api/v1/auth/login").send({
+    email: "operador1@ssrmining.local",
+    password: "Operador12345!"
+  });
+
+  return response.body.token as string;
+};
+
 describe("Equipos", () => {
   it("bloquea listado de equipos sin token", async () => {
     const response = await request(app).get("/api/v1/equipos");
@@ -26,6 +35,24 @@ describe("Equipos", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("permite a operador listar solo opciones activas de equipos", async () => {
+    const token = await loginOperador();
+
+    const response = await request(app)
+      .get("/api/v1/equipos/opciones")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBeGreaterThanOrEqual(1);
+    expect(response.body.data[0]).toEqual(
+      expect.objectContaining({
+        idEquipo: expect.any(Number),
+        codigo: expect.any(String)
+      })
+    );
+    expect(response.body.data[0].estado).toBeUndefined();
   });
 
   it("crea, cambia estado y desactiva un equipo", async () => {

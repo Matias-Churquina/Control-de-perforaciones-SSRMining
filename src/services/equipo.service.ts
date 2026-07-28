@@ -30,6 +30,8 @@ const ensureValidEstado = (estado?: string) => {
 export const equipoService = {
   list: () => equipoRepository.list(),
 
+  listActiveOptions: () => equipoRepository.listActiveOptions(),
+
   getById: async (idEquipo: number) => {
     const equipo = await equipoRepository.findById(idEquipo);
 

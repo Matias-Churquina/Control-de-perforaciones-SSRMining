@@ -16,6 +16,11 @@ export const equipoRouter = Router();
 
 equipoRouter.use(authMiddleware);
 
+equipoRouter.get(
+  "/opciones",
+  requireRoles(ROLES.ADMINISTRADOR, ROLES.SUPERVISOR, ROLES.OPERADOR),
+  asyncHandler(equipoController.options)
+);
 equipoRouter.get("/", requireRoles(ROLES.ADMINISTRADOR, ROLES.SUPERVISOR), asyncHandler(equipoController.list));
 equipoRouter.get(
   "/:idEquipo",
