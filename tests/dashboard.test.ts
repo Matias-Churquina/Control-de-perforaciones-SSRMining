@@ -53,6 +53,40 @@ describe("Dashboard", () => {
         operadores: expect.any(Array)
       })
     );
+    expect(response.body.data.opciones.equipos[0]).toEqual(
+      expect.objectContaining({
+        id: expect.any(Number),
+        label: expect.any(String)
+      })
+    );
+  });
+
+  it("filtra resumen por equipo, fase y operador", async () => {
+    const token = await loginAdmin();
+    const baseResponse = await request(app)
+      .get("/api/v1/dashboard/resumen?fechaDesde=2026-07-01&fechaHasta=2026-07-31")
+      .set("Authorization", `Bearer ${token}`);
+
+    const equipo = baseResponse.body.data.opciones.equipos[0];
+    const fase = baseResponse.body.data.opciones.fases[0];
+    const operador = baseResponse.body.data.opciones.operadores[0];
+
+    const response = await request(app)
+      .get(
+        `/api/v1/dashboard/resumen?fechaDesde=2026-07-01&fechaHasta=2026-07-31&idEquipo=${equipo.id}&fase=${encodeURIComponent(fase)}&idUsuarioRegistro=${operador.id}`
+      )
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.filtros).toEqual(
+      expect.objectContaining({
+        idEquipo: String(equipo.id),
+        fase,
+        idUsuarioRegistro: String(operador.id)
+      })
+    );
+    expect(response.body.data.opciones.equipos.length).toBe(baseResponse.body.data.opciones.equipos.length);
+    expect(response.body.data.opciones.operadores.length).toBe(baseResponse.body.data.opciones.operadores.length);
   });
 
   it("valida filtros del resumen", async () => {
