@@ -30,6 +30,11 @@ type PrecisionAccumulator = {
   real: number;
 };
 
+type OptionItem = {
+  id: number;
+  label: string;
+};
+
 type RopGroup = {
   name: string;
   sum: number;
@@ -105,7 +110,12 @@ const toPrecisionGroups = (groups: Record<string, PrecisionAccumulator>): Precis
 
 export const dashboardService = {
   getResumen: async (query: DashboardQuery) => {
-    const perforaciones = await dashboardRepository.getPerforaciones(buildFilters(query));
+    const filters = buildFilters(query);
+    const perforaciones = await dashboardRepository.getPerforaciones(filters);
+    const optionPerforaciones = await dashboardRepository.getPerforaciones({
+      fechaDesde: filters.fechaDesde,
+      fechaHasta: filters.fechaHasta
+    });
 
     let totalMetros = 0;
     let sumRop = 0;
@@ -124,8 +134,8 @@ export const dashboardService = {
     const precisionPorOperador: Record<string, PrecisionAccumulator> = {};
     const estados: Record<string, number> = {};
     const opcionesFase = new Set<string>();
-    const opcionesEquipo = new Set<string>();
-    const opcionesOperador = new Set<string>();
+    const opcionesEquipo = new Map<number, string>();
+    const opcionesOperador = new Map<number, string>();
 
     for (const perforacion of perforaciones) {
       const metros = toNumber(perforacion.metrosPerforados);
@@ -158,10 +168,6 @@ export const dashboardService = {
       addPrecision(precisionPorFase, perforacion.fase, diseno, metros, real);
       addPrecision(precisionPorBanco, banco, diseno, metros, real);
       addPrecision(precisionPorOperador, operador, diseno, metros, real);
-      opcionesFase.add(perforacion.fase);
-      opcionesEquipo.add(equipo);
-      opcionesOperador.add(operador);
-
       ropPorRoca[perforacion.tipoRoca] = ropPorRoca[perforacion.tipoRoca] ?? {
         name: perforacion.tipoRoca,
         sum: 0,
@@ -169,6 +175,14 @@ export const dashboardService = {
       };
       ropPorRoca[perforacion.tipoRoca].sum += rop;
       ropPorRoca[perforacion.tipoRoca].count++;
+    }
+
+    for (const perforacion of optionPerforaciones) {
+      const operador = `${perforacion.usuarioRegistro.apellido}, ${perforacion.usuarioRegistro.nombre}`;
+
+      opcionesFase.add(perforacion.fase);
+      opcionesEquipo.set(perforacion.idEquipo, perforacion.equipo.codigo);
+      opcionesOperador.set(perforacion.idUsuarioRegistro, operador);
     }
 
     return {
@@ -181,8 +195,12 @@ export const dashboardService = {
       },
       opciones: {
         fases: Array.from(opcionesFase).sort(),
-        equipos: Array.from(opcionesEquipo).sort(),
-        operadores: Array.from(opcionesOperador).sort()
+        equipos: Array.from(opcionesEquipo, ([id, label]): OptionItem => ({ id, label })).sort((a, b) =>
+          a.label.localeCompare(b.label)
+        ),
+        operadores: Array.from(opcionesOperador, ([id, label]): OptionItem => ({ id, label })).sort((a, b) =>
+          a.label.localeCompare(b.label)
+        )
       },
       graficos: {
         metrosPorRoca: toSortedGroups(metrosPorRoca),
