@@ -15,7 +15,7 @@ const swaggerDocument = YAML.load("docs/openapi.yaml");
 export const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: env.corsOrigin }));
+app.use(cors({ origin: env.corsOrigins }));
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));
 app.use(

@@ -17,13 +17,18 @@
   "scripts": {
     "dev": "tsx watch index.ts",
     "build": "tsc",
+    "build:demo": "npm run prisma:generate:demo && tsc",
     "check": "npm run build && npm test",
     "start": "node dist/index.js",
+    "start:demo": "node dist/index.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "lint": "eslint .",
     "prisma:generate": "prisma generate",
+    "prisma:generate:demo": "prisma generate --schema prisma/schema.postgres.prisma",
     "prisma:migrate": "prisma migrate dev",
+    "db:push:demo": "prisma db push --schema prisma/schema.postgres.prisma",
+    "db:prepare:demo": "npm run prisma:generate:demo && npm run db:push:demo && npm run db:seed",
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts"
   },
