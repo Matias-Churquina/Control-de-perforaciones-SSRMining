@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Rol {
+  idRol              Int       @id @default(autoincrement())
+  nombre             String    @unique @db.VarChar(50)
+  descripcion        String?   @db.VarChar(255)
+  activo             Boolean   @default(true)
+  fechaCreacion      DateTime  @default(now())
+  fechaActualizacion DateTime  @updatedAt
+  usuarios           Usuario[]
+
+  @@map("Roles")
+}
+
+model Usuario {
+  idUsuario                Int           @id @default(autoincrement())
+  idRol                    Int
+  legajo                   String        @unique @db.VarChar(50)
+  nombre                   String        @db.VarChar(100)
+  apellido                 String        @db.VarChar(100)
+  email                    String        @unique @db.VarChar(150)
+  passwordHash             String        @db.VarChar(255)
+  activo                   Boolean       @default(true)
+  fechaAlta                DateTime      @default(now())
+  ultimoAcceso             DateTime?
+  rol                      Rol           @relation(fields: [idRol], references: [idRol])
+  perforacionesRegistradas Perforacion[] @relation("UsuarioRegistro")
+  perforacionesRevisadas   Perforacion[] @relation("SupervisorRevision")
+
+  @@map("Usuarios")
+}
+
+model Equipo {
+  idEquipo           Int             @id @default(autoincrement())
+  codigo             String          @unique @db.VarChar(50)
+  descripcion        String          @db.VarChar(150)
+  modelo             String?         @db.VarChar(100)
+  estado             String          @default("ACTIVO") @db.VarChar(20)
+  fechaAlta          DateTime        @default(now())
+  fechaActualizacion DateTime        @updatedAt
+  perforaciones      Perforacion[]
+
+  @@map("Equipos")
+}
+
+model Perforacion {
+  idPerforacion        Int          @id @default(autoincrement())
+  codigoPerforacion    String       @unique @db.VarChar(50)
+  fecha                DateTime     @db.Date
+  fase                 String       @db.VarChar(50)
+  banco                Int
+  malla                String       @db.VarChar(50)
+  idPozo               String       @db.VarChar(50)
+  tipoRoca             String       @db.VarChar(50)
+  profundidadDiseno    Decimal      @db.Decimal(10, 2)
+  metrosPerforados     Decimal      @db.Decimal(10, 2)
+  profundidadReal      Decimal      @db.Decimal(10, 2)
+  horaInicio           DateTime     @db.Time
+  horaFin              DateTime     @db.Time
+  tipoPozo             String       @db.VarChar(50)
+  observaciones        String?
+  estado               String       @default("PENDIENTE") @db.VarChar(20)
+  idUsuarioRegistro    Int
+  idSupervisorRevision Int?
+  fechaRevision        DateTime?
+  motivoRechazo        String?      @db.VarChar(255)
+  idEquipo             Int
+  fechaCreacion        DateTime     @default(now())
+  fechaActualizacion   DateTime     @updatedAt
+  usuarioRegistro      Usuario      @relation("UsuarioRegistro", fields: [idUsuarioRegistro], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction)
+  supervisorRevision   Usuario?     @relation("SupervisorRevision", fields: [idSupervisorRevision], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction)
+  equipo               Equipo       @relation(fields: [idEquipo], references: [idEquipo], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([fecha])
+  @@index([estado])
+  @@index([idEquipo])
+  @@index([idUsuarioRegistro])
+  @@map("Perforaciones")
+}
