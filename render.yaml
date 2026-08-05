@@ -3,11 +3,13 @@ services:
     name: ssrmining-api-demo
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build:demo
+    buildCommand: npm ci --include=dev && npm run build:demo
     startCommand: npm run start:demo
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
       - key: JWT_EXPIRES_IN
         value: 8h
       - key: JWT_SECRET
